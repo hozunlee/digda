@@ -1,0 +1,28 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+node_modules
+.pnp
+.pnp.js
+
+# svelte-kit
+build
+.svelte-kit
+/package
+
+# misc
+.DS_Store
+*.pem
+
+# turbo
+.turbo
+
+# env
+.env
+.env.*
+!.env.example
+!packages/database/.env
+
+# vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
