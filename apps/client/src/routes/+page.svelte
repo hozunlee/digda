@@ -2,6 +2,8 @@
 	import { socket } from '$lib/socket'
 	import { onMount } from 'svelte'
 
+	import { Button } from '$lib/components/ui/button'
+
 	let currentMessage = $state('') // 입력창에 입력된 메시지를 저장할 변수
 
 	let returnMessage = $state(['']) // 서버로부터 받은 메시지를 저장할 변수
@@ -45,7 +47,7 @@
 		placeholder="Type a message..."
 		onkeypress={(e) => e.key === 'Enter'}
 	/>
-	<button type="submit">Send</button>
+	<Button type="submit">Send</Button>
 </form>
 
 <ul>

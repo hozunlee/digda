@@ -1,5 +1,5 @@
 import http from "http";
-import { attach_sockets } from "./server_sockets.js";
+import { attach_sockets } from "./lib/server_sockets.js";
 
 // HTTP 서버 생성
 const server = http.createServer();
