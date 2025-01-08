@@ -1,36 +1,37 @@
 <script>
-	import { onMount } from 'svelte';
-	import { io } from 'socket.io-client';
+	import { socket } from '$lib/socket'
+	import { onMount } from 'svelte'
 
-	let socket;
-	let currentMessage = $state('');
+	let currentMessage = $state('') // 입력창에 입력된 메시지를 저장할 변수
+
+	let returnMessage = $state(['']) // 서버로부터 받은 메시지를 저장할 변수
 
 	onMount(() => {
-		socket = io('http://localhost:3000', {
-			withCredentials: true,
-			transports: ['websocket']
-		});
+		socket.connect()
 
 		socket.on('connect', () => {
-			console.log('Connected to server');
-		});
+			console.log('🧑🏾‍💻 Socket connected')
+		})
 
-		socket.on('eventFromServer', (message) => {
-			console.log(message);
-		});
+		socket.on('disconnect', () => {
+			console.log('🧑🏾‍💻 Socket disconnected')
+		})
 
-		socket.on('connect_error', (error) => {
-			console.error('Connection error:', error);
-		});
-		return () => {
-			socket?.disconnect();
-		};
-	});
+		if (!socket.isConnected) {
+			return console.log('🧑🏾‍💻 Socket is not connected')
+		}
+		const unsubscribe = socket.on('eventFromServer', (message) => {
+			// 불변성을 유지하면서 배열 업데이트
+			returnMessage = [...returnMessage, message]
+		})
+
+		return () => unsubscribe()
+	})
 
 	function sendMessage() {
-		if (currentMessage && socket) {
-			socket.emit('eventFromClient', currentMessage);
-			currentMessage = ''; // 메시지 전송 후 입력창 초기화
+		if (currentMessage.trim()) {
+			socket.emit('eventFromClient', currentMessage)
+			currentMessage = ''
 		}
 	}
 </script>
@@ -38,9 +39,17 @@
 <h1>Welcome to SvelteKit</h1>
 <p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
 
-<input
-	bind:value={currentMessage}
-	placeholder="Type a message..."
-	onkeydown={(e) => e.key === 'Enter' && sendMessage()}
-/>
-<button onclick={sendMessage}>Send</button>
+<form onsubmit={sendMessage}>
+	<input
+		bind:value={currentMessage}
+		placeholder="Type a message..."
+		onkeypress={(e) => e.key === 'Enter'}
+	/>
+	<button type="submit">Send</button>
+</form>
+
+<ul>
+	{#each returnMessage as message}
+		<li>{message}</li>
+	{/each}
+</ul>
