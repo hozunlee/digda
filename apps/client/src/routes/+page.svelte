@@ -3,9 +3,9 @@
 	import { onMount } from 'svelte'
 
 	import { Button } from '$lib/components/ui/button'
+	import { Input } from '$lib/components/ui/input'
 
 	let currentMessage = $state('') // 입력창에 입력된 메시지를 저장할 변수
-
 	let returnMessage = $state(['']) // 서버로부터 받은 메시지를 저장할 변수
 
 	onMount(() => {
@@ -38,11 +38,9 @@
 	}
 </script>
 
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
-
-<form onsubmit={sendMessage}>
-	<input
+<form onsubmit={sendMessage} class="flex max-w-lg mt-10 items-center">
+	<Input
+		class="w-full"
 		bind:value={currentMessage}
 		placeholder="Type a message..."
 		onkeypress={(e) => e.key === 'Enter'}

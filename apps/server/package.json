@@ -12,6 +12,10 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "edgedb": "^1.5.12",
         "socket.io": "^4.8.1"
+    },
+    "devDependencies": {
+        "@edgedb/generate": "^0.5.6"
     }
 }
