@@ -12,6 +12,10 @@ const config = {
 			'@/*': './path/to/lib/*'
 		}
 	},
+	// CSR 설정
+	router: {
+		type: 'spa'
+	},
 
 	preprocess: [mdsvex()],
 	extensions: ['.svelte', '.svx']
