@@ -16,12 +16,22 @@ import { io } from 'socket.io-client'
 class SocketWrapper {
 	/** @type {import('socket.io-client').Socket} */
 	#socket
-
+	#socketStore
 	#isConnected // 연결 상태만 관리 (true/false)
 
+	// 싱글톤 인스턴스
+	static #instance
+
 	constructor() {
+		if (SocketWrapper.#instance) {
+			return SocketWrapper.#instance
+		}
+
+		this.#socketStore = writable(null)
 		this.#isConnected = writable(false)
+		SocketWrapper.#instance = this // 인스턴스를 저장
 	}
+
 	// 연결 상태를 구독할 수 있는 메서드 추가
 	get isConnected() {
 		return {
@@ -36,6 +46,11 @@ class SocketWrapper {
 	 * @param {SocketOptions} [options={}] - 소켓 설정. Default is `{}`
 	 */
 	connect(url = 'http://localhost:3000', options = {}) {
+		if (this.#socket) {
+			console.warn('Socket already initialized. Returning existing socket.')
+			return this.#socket
+		}
+
 		try {
 			this.#socket = io(url, {
 				withCredentials: true,
@@ -44,6 +59,8 @@ class SocketWrapper {
 				reconnectionDelay: 1000,
 				...options
 			})
+
+			this.#socketStore.set(this.#socket)
 
 			this.#socket.on('connect', () => {
 				console.log('Connected with ID:', this.#socket.id)
@@ -90,14 +107,11 @@ class SocketWrapper {
 			return () => {}
 		}
 
-		// console.log(`Registering listener for event: ${event}`);
 		this.#socket.on(event, (...args) => {
-			// console.log(`Received ${event} event:`, ...args);
 			callback(...args)
 		})
 
 		return () => {
-			// console.log(`Removing listener for event: ${event}`);
 			this.#socket?.off(event, callback)
 		}
 	}
@@ -109,4 +123,5 @@ class SocketWrapper {
 	}
 }
 
+// 싱글톤 인스턴스를 생성하여 export
 export const socket = new SocketWrapper()
