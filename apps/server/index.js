@@ -1,8 +1,52 @@
 import http from "http";
 import { attach_sockets } from "./lib/server_sockets.js";
 import edgeClient from "./src/db/client.js";
-// HTTP 서버 생성
-const server = http.createServer();
+
+import {
+    handleRegisterOptions,
+    handleRegister,
+    handleAuthenticateOptions,
+    handleAuthenticate,
+    handleVerify,
+} from "./lib/auth/webauthn.js";
+
+// HTTP 서버 생성 - WebAuthn 라우팅 포함
+const server = http.createServer(async (req, res) => {
+    const requestUrl = getRequestUrl(req);
+
+    switch (requestUrl.pathname) {
+        case "/auth/webauthn/register/options": {
+            await handleRegisterOptions(req, res);
+            break;
+        }
+
+        case "/auth/webauthn/register": {
+            await handleRegister(req, res);
+            break;
+        }
+
+        case "/auth/webauthn/authenticate/options": {
+            await handleAuthenticateOptions(req, res);
+            break;
+        }
+
+        case "/auth/webauthn/authenticate": {
+            await handleAuthenticate(req, res);
+            break;
+        }
+
+        case "/auth/webauthn/verify": {
+            await handleVerify(req, res);
+            break;
+        }
+
+        default: {
+            res.writeHead(404);
+            res.end("Not found");
+            break;
+        }
+    }
+});
 
 async function testConnection() {
     try {
