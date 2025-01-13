@@ -11,4 +11,13 @@ const edgeClient = createClient({
     tlsSecurity: "strict",
 });
 
+// const a = await edgeClient.query(`
+//     SELECT Movie{
+//     title
+//     } ;
+//     `);
+
+// const b = await edgeClient.querySingle(`select 1 + 1`);
+
+// console.log("a :>> ", a, b);
 export default edgeClient;
