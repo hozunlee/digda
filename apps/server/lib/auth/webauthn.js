@@ -1,4 +1,10 @@
-const handleRegisterOptions = async (req, res) => {
+import { generatePKCE } from "./PKCE.js";
+import { URL } from "node:url";
+
+const EDGEDB_AUTH_BASE_URL = process.env.EDGEDB_AUTH_BASE_URL;
+const SERVER_PORT = process.env.SERVER_PORT || 3000;
+
+export const handleRegisterOptions = async (req, res) => {
     let body = "";
     req.on("data", (chunk) => {
         body += chunk.toString();
@@ -35,7 +41,7 @@ const handleRegisterOptions = async (req, res) => {
     });
 };
 
-const handleAuthenticateOptions = async (req, res) => {
+export const handleAuthenticateOptions = async (req, res) => {
     let body = "";
     req.on("data", (chunk) => {
         body += chunk.toString();
@@ -73,7 +79,7 @@ const handleAuthenticateOptions = async (req, res) => {
 };
 
 // Register a new credential
-const handleRegister = async (req, res) => {
+export const handleRegister = async (req, res) => {
     let body = "";
     req.on("data", (chunk) => {
         body += chunk.toString();
@@ -152,7 +158,7 @@ const handleRegister = async (req, res) => {
 
 // Authenticate with an existing credential
 
-const handleAuthenticate = async (req, res) => {
+export const handleAuthenticate = async (req, res) => {
     let body = "";
     req.on("data", (chunk) => {
         body += chunk.toString();
@@ -230,7 +236,7 @@ const handleAuthenticate = async (req, res) => {
  * @param {Request} req
  * @param {Response} res
  */
-const handleVerify = async (req, res) => {
+export const handleVerify = async (req, res) => {
     const requestUrl = getRequestUrl(req);
     const verification_token =
         requestUrl.searchParams.get("verification_token");

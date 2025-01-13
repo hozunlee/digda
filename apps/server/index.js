@@ -1,5 +1,11 @@
 import http from "http";
+import "dotenv/config";
+
+import { getRequestUrl } from "./lib/utils.js";
+
+// socket.io 서버 연결
 import { attach_sockets } from "./lib/server_sockets.js";
+// edgeDB 클라이언트 연결
 import edgeClient from "./src/db/client.js";
 
 import {
@@ -13,6 +19,7 @@ import {
 // HTTP 서버 생성 - WebAuthn 라우팅 포함
 const server = http.createServer(async (req, res) => {
     const requestUrl = getRequestUrl(req);
+    console.log("🚀 ~ server ~ requestUrl:", requestUrl);
 
     switch (requestUrl.pathname) {
         case "/auth/webauthn/register/options": {
@@ -21,6 +28,7 @@ const server = http.createServer(async (req, res) => {
         }
 
         case "/auth/webauthn/register": {
+            console.log("실행?");
             await handleRegister(req, res);
             break;
         }

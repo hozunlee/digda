@@ -1,5 +1,5 @@
 import { createClient } from "edgedb";
-import "dotenv/config";
+
 // const edgeClient = createClient({
 //     dns: process.env.EDGEDB_CONNECTION_STRING,
 //     tlsSecurity: "strict",

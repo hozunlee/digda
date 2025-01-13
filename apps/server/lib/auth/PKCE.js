@@ -1,10 +1,4 @@
-import http from "node:http";
-import { URL } from "node:url";
 import crypto from "node:crypto";
-import "dotenv/config";
-
-const EDGEDB_AUTH_BASE_URL = process.env.EDGEDB_AUTH_BASE_URL;
-const SERVER_PORT = process.env.SERVER_PORT || 3000;
 
 /**
  * Generate a random Base64 url-encoded string, and derive a "challenge"
@@ -13,7 +7,7 @@ const SERVER_PORT = process.env.SERVER_PORT || 3000;
  *
  * @returns {Object} The verifier and challenge strings
  */
-const generatePKCE = () => {
+export const generatePKCE = () => {
     const verifier = crypto.randomBytes(32).toString("base64url");
 
     const challenge = crypto
