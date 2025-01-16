@@ -1,5 +1,14 @@
-module default {
+using extension auth;
 
+# 스키마 변경 시 (cloud)
+# edgedb migration create -I [your db] 
+# 클라우드 적용
+# edgedb migrate -I [your db] 
+# 상태확인
+# edgedb migration status -I [your db] 
+
+
+module default {
 type Movie {
   required property title -> str;
   required property year -> int16;
