@@ -1,59 +1,72 @@
 import http from "http";
 import "dotenv/config";
 
-import { getRequestUrl } from "./lib/utils.js";
+// import { getRequestUrl } from "./lib/utils.js";
 
 // socket.io 서버 연결
 import { attach_sockets } from "./lib/server_sockets.js";
 // edgeDB 클라이언트 연결
 import edgeClient from "./src/db/client.js";
 
-import {
-    handleRegisterOptions,
-    handleRegister,
-    handleAuthenticateOptions,
-    handleAuthenticate,
-    handleVerify,
-} from "./lib/auth/webauthn.js";
+// import {
+//     // handleRegisterOptions,
+//     handleRegister,
+//     handleAuthenticateOptions,
+//     handleAuthenticate,
+//     handleVerify,
+// } from "./lib/auth/webauthn.js";
+
+// const handleRegisterOptions = async (req, res) => {
+//     let body = "";
+//     req.on("data", (chunk) => {
+//         body += chunk.toString();
+//     });
+//     req.on("end", async () => {
+//         const { email } = JSON.parse(body);
+//     });
+// };
 
 // HTTP 서버 생성 - WebAuthn 라우팅 포함
 const server = http.createServer(async (req, res) => {
+    res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+
     const requestUrl = getRequestUrl(req);
-    console.log("🚀 ~ server ~ requestUrl:", requestUrl);
 
-    switch (requestUrl.pathname) {
-        case "/auth/webauthn/register/options": {
-            await handleRegisterOptions(req, res);
-            break;
-        }
+    // switch (requestUrl.pathname) {
+    //     case "/auth/webauthn/register/options": {
+    //         await handleRegisterOptions(req, res);
+    //         break;
+    //     }
 
-        case "/auth/webauthn/register": {
-            console.log("실행?");
-            await handleRegister(req, res);
-            break;
-        }
+    //     case "/auth/webauthn/register": {
+    //         await handleRegister(req, res);
+    //         break;
+    //     }
 
-        case "/auth/webauthn/authenticate/options": {
-            await handleAuthenticateOptions(req, res);
-            break;
-        }
+    //     case "/auth/webauthn/authenticate/options": {
+    //         await handleAuthenticateOptions(req, res);
+    //         break;
+    //     }
 
-        case "/auth/webauthn/authenticate": {
-            await handleAuthenticate(req, res);
-            break;
-        }
+    //     case "/auth/webauthn/authenticate": {
+    //         await handleAuthenticate(req, res);
+    //         break;
+    //     }
 
-        case "/auth/webauthn/verify": {
-            await handleVerify(req, res);
-            break;
-        }
+    // case "/auth/webauthn/verify": {
+    //     await handleVerify(req, res);
+    //     break;
+    // }
 
-        default: {
-            res.writeHead(404);
-            res.end("Not found");
-            break;
-        }
-    }
+    //     default: {
+    //         res.writeHead(404);
+    //         res.end("Not found");
+    //         break;
+    //     }
+    // }
 });
 
 async function testConnection() {

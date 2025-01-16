@@ -98,7 +98,7 @@ class SocketWrapper {
 	 * 이벤트 리스너를 등록합니다
 	 *
 	 * @param {string} event - 이벤트 이름
-	 * @param {Function} callback - 콜백 함수
+	 * @param {() => void} callback - 콜백 함수
 	 * @returns {Function} 리스너 해제 함수
 	 */
 	on(event, callback) {
@@ -107,13 +107,26 @@ class SocketWrapper {
 			return () => {}
 		}
 
-		this.#socket.on(event, (...args) => {
-			callback(...args)
-		})
+		this.#socket.on(event, callback)
 
 		return () => {
 			this.#socket?.off(event, callback)
 		}
+	}
+
+	/**
+	 * 이벤트 리스너를 제거합니다
+	 *
+	 * @param {string} event - 이벤트 이름
+	 * @param {() => void} [callback] - 콜백 함수
+	 */
+	off(event, callback) {
+		if (!this.#socket) {
+			console.warn('Socket not initialized. Call connect() first.')
+			return
+		}
+
+		this.#socket.off(event, callback)
 	}
 
 	/** 소켓 연결을 종료합니다 */

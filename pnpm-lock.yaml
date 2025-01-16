@@ -14,6 +14,9 @@ importers:
 
   apps/client:
     dependencies:
+      '@edgedb/auth-core':
+        specifier: ^0.2.1
+        version: 0.2.1(edgedb@1.5.12)
       '@tailwindcss/container-queries':
         specifier: ^0.1.1
         version: 0.1.1(tailwindcss@3.4.17)
@@ -125,6 +128,11 @@ packages:
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
+
+  '@edgedb/auth-core@0.2.1':
+    resolution: {integrity: sha512-denOSLG7vefeb5hoSPxGu8NV1EeDO1XAAli17nhl8l4nQUVjnrSIE/5keTXib6DUel3nZSJG+yLmYkIrOFJOBQ==}
+    peerDependencies:
+      edgedb: ^1.3.6
 
   '@edgedb/generate@0.5.6':
     resolution: {integrity: sha512-Nmd4ibgN3M7qxxHsOyB9NERp03449BfV+W7CWCpIE/tcvBr19GynoT5yI3k55k5NKzzstATwKtV+wVHXiOgizw==}
@@ -1128,6 +1136,9 @@ packages:
   json-stable-stringify-without-jsonify@1.0.1:
     resolution: {integrity: sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==}
 
+  jwt-decode@3.1.2:
+    resolution: {integrity: sha512-UfpWE/VZn0iP50d8cz9NrZLM9lSWhcJ+0Gt/nm4by88UL+J1SiKN8/5dkjMmbEzwL2CAe+67GsegCbIKtbp75A==}
+
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
 
@@ -1892,6 +1903,11 @@ snapshots:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.8
       '@jridgewell/trace-mapping': 0.3.25
+
+  '@edgedb/auth-core@0.2.1(edgedb@1.5.12)':
+    dependencies:
+      edgedb: 1.5.12
+      jwt-decode: 3.1.2
 
   '@edgedb/generate@0.5.6(edgedb@1.5.12)':
     dependencies:
@@ -2823,6 +2839,8 @@ snapshots:
   json-schema-traverse@0.4.1: {}
 
   json-stable-stringify-without-jsonify@1.0.1: {}
+
+  jwt-decode@3.1.2: {}
 
   keyv@4.5.4:
     dependencies:

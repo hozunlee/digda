@@ -1,30 +1,27 @@
 <script>
 	import { socket } from '$lib/socket'
-	import { onMount } from 'svelte'
 
 	import { Button } from '$lib/components/ui/button'
 	import { Input } from '$lib/components/ui/input'
 
+	let isConnected = $state(false)
+
 	let currentMessage = $state('') // 입력창에 입력된 메시지를 저장할 변수
 	let returnMessage = $state(['']) // 서버로부터 받은 메시지를 저장할 변수
 
-	onMount(() => {
-		socket.connect()
+	// 소켓 연결 상태 구독
+	$effect(() => {
+		const unsubscribe = socket.isConnected.subscribe((connected) => {
+			isConnected = connected
 
-		socket.on('connect', () => {
-			console.log('🧑🏾‍💻 Socket connected')
-		})
+			if (connected) {
+				// 소켓이 연결되면 이벤트 리스너 등록
+				const messageUnsubscribe = socket.on('eventFromServer', (message) => {
+					returnMessage = [...returnMessage, message]
+				})
 
-		socket.on('disconnect', () => {
-			console.log('🧑🏾‍💻 Socket disconnected')
-		})
-
-		if (!socket.isConnected) {
-			return console.log('🧑🏾‍💻 Socket is not connected')
-		}
-		const unsubscribe = socket.on('eventFromServer', (message) => {
-			// 불변성을 유지하면서 배열 업데이트
-			returnMessage = [...returnMessage, message]
+				return () => messageUnsubscribe()
+			}
 		})
 
 		return () => unsubscribe()
@@ -47,7 +44,7 @@
 	/>
 	<Button type="submit">Send</Button>
 </form>
-
+<a href="/login"><Button class="mt-4">로그인</Button> </a>
 <ul>
 	{#each returnMessage as message}
 		<li>{message}</li>
