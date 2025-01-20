@@ -1,8 +1,8 @@
+import { getRequestUrl } from "../utils.js";
 import { generatePKCE } from "./PKCE.js";
 import { URL } from "node:url";
 
 const EDGEDB_AUTH_BASE_URL = process.env.EDGEDB_AUTH_BASE_URL;
-const SERVER_PORT = process.env.SERVER_PORT || 3000;
 
 export const handleRegisterOptions = async (req, res) => {
     let body = "";
@@ -10,6 +10,12 @@ export const handleRegisterOptions = async (req, res) => {
         body += chunk.toString();
     });
     req.on("end", async () => {
+        // body가 비어있는지 확인
+        if (!body) {
+            res.writeHead(400);
+            res.end("Empty request body");
+            return;
+        }
         const { email } = JSON.parse(body);
         if (!email) {
             res.status = 400;

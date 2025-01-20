@@ -1,7 +1,7 @@
 import http from "http";
 import "dotenv/config";
 
-// import { getRequestUrl } from "./lib/utils.js";
+import { getRequestUrl } from "./lib/utils.js";
 
 // socket.io 서버 연결
 import { attach_sockets } from "./lib/server_sockets.js";
@@ -9,11 +9,11 @@ import { attach_sockets } from "./lib/server_sockets.js";
 import edgeClient from "./src/db/client.js";
 
 // import {
-//     // handleRegisterOptions,
-//     handleRegister,
-//     handleAuthenticateOptions,
-//     handleAuthenticate,
-//     handleVerify,
+// handleRegisterOptions,
+// handleRegister,
+// handleAuthenticateOptions,
+// handleAuthenticate,
+// handleVerify,
 // } from "./lib/auth/webauthn.js";
 
 // const handleRegisterOptions = async (req, res) => {
@@ -33,7 +33,7 @@ const server = http.createServer(async (req, res) => {
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
     res.setHeader("Access-Control-Allow-Credentials", "true");
 
-    const requestUrl = getRequestUrl(req);
+    // const requestUrl = getRequestUrl(req);
 
     // switch (requestUrl.pathname) {
     //     case "/auth/webauthn/register/options": {
@@ -57,16 +57,16 @@ const server = http.createServer(async (req, res) => {
     //     }
 
     // case "/auth/webauthn/verify": {
-    //     await handleVerify(req, res);
-    //     break;
+    // await handleVerify(req, res);
+    // break;
     // }
 
-    //     default: {
-    //         res.writeHead(404);
-    //         res.end("Not found");
-    //         break;
+    //         default: {
+    //             res.writeHead(404);
+    //             res.end("Not found");
+    //             break;
+    //         }
     //     }
-    // }
 });
 
 async function testConnection() {

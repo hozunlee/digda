@@ -66,7 +66,7 @@ export function attach_sockets(server) {
             }
         });
 
-        // 회원 ``등록 요청
+        // 회원 등록 요청
         socket.on("webauthn:register", async (data) => {
             console.log("📟 user로부터 register 최종 요청이 왔습니다.");
             try {
@@ -92,7 +92,7 @@ export function attach_sockets(server) {
             }
         });
 
-        // 인증 옵션 요청
+        // 로그인 인증 옵션 요청
         socket.on("webauthn:authenticate:options", async (data) => {
             try {
                 const { email } = data;
@@ -107,6 +107,92 @@ export function attach_sockets(server) {
 
                 socket.emit("webauthn:authenticate:options:response", result);
             } catch (error) {
+                socket.emit("webauthn:error", error.message);
+            }
+        });
+
+        // 로그인 요청
+        // 인증 처리
+        socket.on("webauthn:authenticate", async (data) => {
+            console.log("📟 user로부터 authenticate 로그인 요청이 왔습니다.");
+            try {
+                const { email, provider, assertion } = data;
+
+                // console.log("email :>> ", email, provider, assertion);
+                const { challenge, verifier } = generatePKCE();
+
+                if (!email || !provider || !assertion) {
+                    socket.emit(
+                        "webauthn:error",
+                        "필수 데이터가 누락되었습니다."
+                    );
+                    return;
+                }
+
+                // 인증 요청
+                const authenticateUrl = new URL(
+                    "webauthn/authenticate",
+                    EDGEDB_AUTH_BASE_URL
+                );
+
+                const authenticateResponse = await fetch(authenticateUrl.href, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        provider,
+                        email,
+                        assertion,
+                        challenge,
+                        verifier: false,
+                    }),
+                });
+
+                if (!authenticateResponse.ok) {
+                    const text = await authenticateResponse.text();
+                    socket.emit("webauthn:error", `인증 서버 오류: ${text}`);
+                    return;
+                }
+
+                const authenticateData = await authenticateResponse.json();
+                console.log(
+                    "🚀 ~ socket.on ~ authenticateData:",
+                    authenticateData
+                );
+
+                // 토큰 요청 및 처리
+                if ("code" in authenticateData) {
+                    const tokenUrl = new URL("token", EDGEDB_AUTH_BASE_URL);
+                    tokenUrl.searchParams.set("code", authenticateData.code);
+                    tokenUrl.searchParams.set("verifier", verifier);
+
+                    const tokenResponse = await fetch(tokenUrl.href);
+                    console.log(
+                        "🚀 ~ socket.on ~ tokenResponse:",
+                        tokenResponse
+                    );
+                    if (!tokenResponse.ok) {
+                        const text = await tokenResponse.text();
+                        console.log("🚀 ~ socket.on ~ text:", text);
+                        socket.emit(
+                            "webauthn:error",
+                            `토큰 서버 오류: ${text}`
+                        );
+                        return;
+                    }
+
+                    const { auth_token } = await tokenResponse.json();
+
+                    // 인증 성공 응답
+                    socket.emit("webauthn:authenticate:response", {
+                        success: true,
+                        auth_token,
+                        message: "인증 성공",
+                    });
+                } else {
+                    socket.emit("webauthn:error", "이메일 인증이 필요합니다.");
+                }
+            } catch (error) {
+                console.error("Authentication error:", error);
                 socket.emit("webauthn:error", error.message);
             }
         });

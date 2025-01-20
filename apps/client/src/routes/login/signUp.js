@@ -50,3 +50,49 @@ export function SetEncodeCredentials(credentials) {
 		type: credentials.type
 	}
 }
+
+// sign in fuction
+
+export async function getAssertion(options) {
+	try {
+		const publicKeyCredential = await navigator.credentials.get({
+			publicKey: {
+				...options,
+				challenge: base64UrlToBytes(options.challenge),
+				allowCredentials: options.allowCredentials?.map((credential) => ({
+					...credential,
+					id: base64UrlToBytes(credential.id)
+				}))
+			}
+		})
+
+		if (!publicKeyCredential) {
+			throw new Error('인증 실패: 크리덴셜을 가져올 수 없습니다.')
+		}
+
+		return publicKeyCredential
+	} catch (error) {
+		console.error('Assertion error:', error)
+		throw new Error(`인증 실패: ${error.message}`)
+	}
+}
+
+export function encodeAssertion(assertion) {
+	const { response: assertionResponse } = assertion
+
+	return {
+		type: assertion.type,
+		id: assertion.id,
+		authenticatorAttachments: assertion.authenticatorAttachment,
+		clientExtensionResults: assertion.getClientExtensionResults(),
+		rawId: bytesToBase64Url(new Uint8Array(assertion.rawId)),
+		response: {
+			authenticatorData: bytesToBase64Url(new Uint8Array(assertionResponse.authenticatorData)),
+			clientDataJSON: bytesToBase64Url(new Uint8Array(assertionResponse.clientDataJSON)),
+			signature: bytesToBase64Url(new Uint8Array(assertionResponse.signature)),
+			userHandle: assertionResponse.userHandle
+				? bytesToBase64Url(new Uint8Array(assertionResponse.userHandle))
+				: null
+		}
+	}
+}

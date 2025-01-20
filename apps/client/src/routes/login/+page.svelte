@@ -5,7 +5,7 @@
 
 	import { Button } from '$lib/components/ui/button'
 	import { Input } from '$lib/components/ui/input'
-	import { createCredentials, SetEncodeCredentials } from './signUp'
+	import { createCredentials, encodeAssertion, getAssertion, SetEncodeCredentials } from './signUp'
 	import { dev } from '$app/environment'
 
 	// const webAuthnClient = new WebAuthnClient({
@@ -143,12 +143,50 @@
 			return
 		}
 
-		socket.emit('webauthn:authenticate:options', { email })
+		try {
+			const options = await new Promise((resolve, reject) => {
+				const handleOptions = (options) => {
+					// socket.off('webauthn:authenticate:options:response', handleOptions)
+					if (dev) console.log('webauthn:authenticate:options:response : socket off ')
+					resolve(options)
+				}
 
-		socket.on('webauthn:authenticate:options:response', async (options) => {
-			// WebAuthn 등록 처리
-			console.log(options, '로그인')
-		})
+				socket.emit('webauthn:authenticate:options', { email })
+				socket.on('webauthn:authenticate:options:response', handleOptions)
+			})
+
+			// 2. assertion 생성
+			const assertion = await getAssertion(options)
+
+			if (!assertion) {
+				throw new Error('Failed to sign in')
+			}
+			const encodedAssertion = encodeAssertion(assertion)
+
+			// 3. 로그인 요청 및 응답 처리
+			const response = await new Promise((resolve) => {
+				const handleAuthenticate = (response) => {
+					console.log('response :>> ', response)
+					socket.off('webauthn:authenticate:response', handleAuthenticate)
+					if (dev) console.log('webauthn:authenticate:response : socket off ')
+					resolve(response)
+				}
+
+				socket.on('webauthn:authenticate:response', handleAuthenticate)
+				socket.emit('webauthn:authenticate', {
+					email,
+					assertion: encodedAssertion,
+					verify_url: 'http://localhost:3000/auth/webauthn/verify',
+					provider: 'webauthn',
+				})
+			})
+
+			console.log('WebAuthn response: 사용자로그인성공!', response)
+		} catch (error) {
+			socket.on('webauthn:error', (error) => {
+				console.error('WebAuthn error:', error)
+			})
+		}
 
 		// try {
 		// 	await webAuthnClient.signIn(email)
