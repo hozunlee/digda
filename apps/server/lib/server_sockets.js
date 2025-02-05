@@ -1,6 +1,9 @@
 import { Server } from "socket.io";
 import { generatePKCE } from "./auth/PKCE.js";
 
+import crypto from "crypto"; // 추가
+import sessionStore from "./sessionStore.js"; // 추가
+
 const EDGEDB_AUTH_BASE_URL = process.env.EDGEDB_AUTH_BASE_URL;
 
 export function attach_sockets(server) {
@@ -166,10 +169,7 @@ export function attach_sockets(server) {
                     tokenUrl.searchParams.set("verifier", verifier);
 
                     const tokenResponse = await fetch(tokenUrl.href);
-                    console.log(
-                        "🚀 ~ socket.on ~ tokenResponse:",
-                        tokenResponse
-                    );
+
                     if (!tokenResponse.ok) {
                         const text = await tokenResponse.text();
                         console.log("🚀 ~ socket.on ~ text:", text);
@@ -180,20 +180,19 @@ export function attach_sockets(server) {
                         return;
                     }
 
+                    //JWT 형태 토큰
                     const { auth_token } = await tokenResponse.json();
 
-                    // 쿠키로 설정 (HttpOnly, Secure)
-                    res.cookie("auth_token", auth_token, {
-                        httpOnly: true,
-                        secure: true,
-                        sameSite: "strict",
-                        path: "/",
-                    });
-                    // 인증 성공 응답
+                    // 액세스 토큰과 세션 토큰으로 분리
+                    const sessionToken = crypto.randomUUID();
+                    // Redis나 서버 메모리에 저장
+                    await sessionStore.set(sessionToken, auth_token);
+
+                    // 클라이언트에는 세션 토큰만 전달
                     socket.emit("webauthn:authenticate:response", {
                         success: true,
-
                         message: "인증 성공",
+                        sessionToken,
                     });
                 } else {
                     socket.emit("webauthn:error", "이메일 인증이 필요합니다.");

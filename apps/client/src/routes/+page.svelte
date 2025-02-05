@@ -101,7 +101,7 @@
 						&ldquo;This library has saved me countless hours of work and helped me deliver stunning
 						designs to my clients faster than ever before. Highly recommended!&rdquo;
 					</p>
-					<footer class="text-sm">Sofia Davis</footer>
+					<footer class="text-sm">Hojun Lee</footer>
 				</blockquote>
 			</div>
 		</div>

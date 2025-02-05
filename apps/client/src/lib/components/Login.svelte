@@ -1,5 +1,8 @@
 <script>
+	import { toast } from 'svelte-sonner'
+
 	import { socket } from '$lib/socket'
+	import { goto } from '$app/navigation'
 
 	import { Button } from '$lib/components/ui/button'
 	import { Input } from '$lib/components/ui/input'
@@ -93,8 +96,35 @@
 
 			// 3. 로그인 요청 및 응답 처리
 			const response = await new Promise((resolve) => {
-				const handleAuthenticate = (response) => {
+				const handleAuthenticate = async (response) => {
 					socket.off('webauthn:authenticate:response', handleAuthenticate)
+
+					if (response.success && response.sessionToken) {
+						try {
+							const res = await fetch('http://localhost:3000/auth/set-token', {
+								method: 'POST',
+								headers: {
+									'Content-Type': 'application/json'
+								},
+								body: JSON.stringify({ sessionToken: response.sessionToken }),
+								credentials: 'include'
+							})
+
+							if (res.ok) {
+								toast.success('로그인 성공', {
+									description: 'Sunday, December 03, 2023 at 9:00 AM',
+									action: {
+										label: 'Undo',
+										onClick: () => console.info('Undo')
+									}
+								})
+								goto('/start')
+							}
+						} catch (error) {
+							console.error('인증 실패:', error)
+						}
+					}
+
 					if (dev) console.log('webauthn:authenticate:response : socket off ')
 					resolve(response)
 				}
@@ -115,6 +145,13 @@
 			})
 		}
 	}
+
+	socket.on('webauthn:authenticate:response', async (data) => {
+		if (data.success) {
+			// 쿠키는 서버에서 설정되므로, 성공 시 바로 리다이렉트
+			goto('/start')
+		}
+	})
 </script>
 
 <figure class="my-5">
@@ -137,7 +174,7 @@
 		authenticate By webAuthn, you visit to our
 		<a
 			target="_blank"
-			href="https://hololog.dev/series/%EB%94%94%EA%B7%B8%EB%8B%A4%20%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8B%89%EB%8B%88%EB%8B%A4./"
+			href="https://hololog.dev/series/%EB%94%94%EA%B7%B8%EB%8B%A4%20%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8B%B1%EB%8B%88%EB%8B%A4./"
 			class="hover:text-primary underline underline-offset-4"
 		>
 			Tech Blog
