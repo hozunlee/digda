@@ -1,0 +1,39 @@
+# docker-compose.yml
+
+version: "3.8"
+
+services:
+    backend:
+        build:
+            context: ./backend
+            dockerfile: Dockerfile
+        container_name: backend
+        volumes:
+            - ./backend:/app
+            - /app/node_modules
+        ports:
+            - "3000:3000"
+        environment:
+            - EDGE_DB_URL=${EDGE_DB_URL} # 클라우드 edgeDB 연결 URL
+            - NODE_ENV=development
+            - PORT=3000
+            # 추가적인 환경 변수 필요 시 여기에 추가
+        # depends_on: # edgeDB가 클라우드에 있으므로 의존성 제거
+
+    frontend:
+        build:
+            context: ./frontend
+            dockerfile: Dockerfile
+        container_name: frontend
+        volumes:
+            - ./frontend:/app
+            - /app/node_modules
+        ports:
+            - "5173:5173" # SvelteKit의 기본 개발 서버 포트
+        environment:
+            - NODE_ENV=development
+            - VITE_BACKEND_URL=http://localhost:3000 # 백엔드 API URL
+            # 추가적인 환경 변수 필요 시 여기에 추가
+        depends_on:
+            - backend
+# 네트워크 설정 (기본 네트워크 사용)
