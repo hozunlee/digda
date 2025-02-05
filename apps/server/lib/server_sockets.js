@@ -84,7 +84,7 @@ export function attach_sockets(server) {
 
                 const result = await response.json();
                 socket.emit("webauthn:register:response", {
-                    verifier,
+                    result,
                     message: "회원가입 성공",
                 });
             } catch (error) {
@@ -182,10 +182,17 @@ export function attach_sockets(server) {
 
                     const { auth_token } = await tokenResponse.json();
 
+                    // 쿠키로 설정 (HttpOnly, Secure)
+                    res.cookie("auth_token", auth_token, {
+                        httpOnly: true,
+                        secure: true,
+                        sameSite: "strict",
+                        path: "/",
+                    });
                     // 인증 성공 응답
                     socket.emit("webauthn:authenticate:response", {
                         success: true,
-                        auth_token,
+
                         message: "인증 성공",
                     });
                 } else {

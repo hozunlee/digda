@@ -121,7 +121,6 @@
 	{/if}
 	<Button on:click={signUp}>Sign Up</Button>
 	<Button on:click={signIn}>Sign In</Button>
-	<Button on:click={test}>Test</Button>
 </main>
 
 <style>
