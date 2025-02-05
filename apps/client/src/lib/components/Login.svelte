@@ -3,11 +3,18 @@
 
 	import { Button } from '$lib/components/ui/button'
 	import { Input } from '$lib/components/ui/input'
-	import { createCredentials, encodeAssertion, getAssertion, SetEncodeCredentials } from './signUp'
+	import {
+		createCredentials,
+		encodeAssertion,
+		getAssertion,
+		SetEncodeCredentials
+	} from '$lib/utils/SignMethod.js'
 	import { dev } from '$app/environment'
 
 	let email = ''
 	let errorMessage = ''
+
+	export let isSignIn = true
 
 	const signUp = async () => {
 		if (!email) {
@@ -97,7 +104,7 @@
 					email,
 					assertion: encodedAssertion,
 					verify_url: 'http://localhost:3000/auth/webauthn/verify',
-					provider: 'webauthn',
+					provider: 'webauthn'
 				})
 			})
 
@@ -107,21 +114,45 @@
 				console.error('WebAuthn error:', error)
 			})
 		}
-
 	}
-
-
 </script>
 
-<main>
-	<h1>WebAuthn Authentication</h1>
-	<Input type="email" bind:value={email} placeholder="Enter your email" />
+<figure class="my-5">
+	<h2 class="text-xl font-semibold tracking-tight">Sign your account</h2>
+	<p class="text-muted-foreground text-sm mt-2">Enter your email below to sign your account</p>
+	<Input type="email" bind:value={email} placeholder="Enter your email" class="mt-5 mb-3" />
+
 	{#if errorMessage}
 		<p class="error">{errorMessage}</p>
 	{/if}
-	<Button on:click={signUp}>Sign Up</Button>
-	<Button on:click={signIn}>Sign In</Button>
-</main>
+	<div class="my-3">
+		{#if isSignIn}
+			<Button class="w-full" on:click={signIn}>로그인</Button>
+		{:else}
+			<Button class="w-full" on:click={signUp}>회원가입</Button>
+		{/if}
+	</div>
+
+	<p class="text-muted-foreground px-8 text-center text-sm mt-8">
+		authenticate By webAuthn, you visit to our
+		<a
+			target="_blank"
+			href="https://hololog.dev/series/%EB%94%94%EA%B7%B8%EB%8B%A4%20%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8B%89%EB%8B%88%EB%8B%A4./"
+			class="hover:text-primary underline underline-offset-4"
+		>
+			Tech Blog
+		</a>
+		and
+		<a
+			target="_blank"
+			href="https://github.com/hozunlee/digda"
+			class="hover:text-primary underline underline-offset-4"
+		>
+			github:digda
+		</a>
+		.
+	</p>
+</figure>
 
 <style>
 	.error {
