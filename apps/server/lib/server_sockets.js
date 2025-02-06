@@ -180,7 +180,9 @@ export function attach_sockets(server) {
                         return;
                     }
 
-                    //JWT 형태 토큰
+                    // 개인키와 공개키의 쌍
+                    // 개인키는 컴퓨터나 개인기기에 저장되어있음
+                    //공개 키 기반 인증 메커니즘
                     const { auth_token } = await tokenResponse.json();
 
                     // 액세스 토큰과 세션 토큰으로 분리
