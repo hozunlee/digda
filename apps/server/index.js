@@ -39,7 +39,6 @@ app.post("/auth/set-token", async (req, res) => {
 
     // 저장된 실제 JWT 토큰 조회
     const auth_token = await sessionStore.get(sessionToken);
-    console.log("🚀 ~ app.post ~ auth_token:", auth_token);
     if (!auth_token) {
         return res.status(401).json({ error: "유효하지 않은 세션" });
     }
