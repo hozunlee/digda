@@ -74,7 +74,7 @@
 	<enhanced:img src={MainDigda} alt="Authentication" class="block dark:hidden"></enhanced:img>
 </div> -->
 	<div
-		class="container relative hidden h-[800px] flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0"
+		class="container relative h-[800px] flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0"
 	>
 		<Button
 			on:click={() => (isSignIn = !isSignIn)}
@@ -83,23 +83,21 @@
 		>
 			{isSignIn ? '회원가입하기' : '로그인하기'}
 		</Button>
-		<div class="bg-muted relative hidden h-full flex-col p-10 text-white lg:flex dark:border-r">
+		<div class="bg-muted relative h-full flex-col p-10 text-white lg:flex dark:border-r">
 			<!-- <div
 			class="absolute inset-0 bg-cover"
 			style="
 				background-image:
 					url(https://images.unsplash.com/photo-1590069261209-f8e9b8642343?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1376&q=80);"
 		></div> -->
-			<div class="relative z-20 flex items-center text-lg font-medium text-gray-400">
+			<div class="relative z-20 flex flex-col items-center text-lg font-medium text-gray-400">
 				dig:hojunLee
+				<enhanced:img src={MainDigda} alt="Authentication" class="block dark:hidden w-fit"/>
 			</div>
-			<enhanced:img src={MainDigda} alt="Authentication" class="block dark:hidden"></enhanced:img>
-
 			<div class="relative z-20 mt-auto">
 				<blockquote class="space-y-2">
 					<p class="text-lg">
-						&ldquo;This library has saved me countless hours of work and helped me deliver stunning
-						designs to my clients faster than ever before. Highly recommended!&rdquo;
+						&ldquo;This library has saved me. Highly recommended!&rdquo;
 					</p>
 					<footer class="text-sm">Hojun Lee</footer>
 				</blockquote>
