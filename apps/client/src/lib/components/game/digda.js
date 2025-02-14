@@ -1,4 +1,50 @@
 /**
+ * 구독자 관리 함수를 생성합니다.
+ *
+ * @returns {Object} 구독자 관리 메서드
+ */
+const createSubscribers = () => {
+	const subscribers = new Set()
+
+	return {
+		/**
+		 * 모든 구독자에게 상태를 알립니다.
+		 *
+		 * @param {GameState} state - 현재 게임 상태
+		 */
+		notify(state) {
+			console.log('현재 구독자 수:', subscribers.size)
+			subscribers.forEach((callback) => {
+				try {
+					callback(state)
+				} catch (error) {
+					console.error('구독자 알림 중 오류:', error)
+				}
+			})
+		},
+
+		/**
+		 * 구독자를 추가합니다.
+		 *
+		 * @param {SubscriberCallback} callback - 상태 변경 시 호출될 콜백 함수
+		 * @returns {Function} 구독 해제 함수
+		 */
+		subscribe(callback) {
+			console.log('새로운 구독자 추가')
+			subscribers.add(callback)
+			console.log('현재 구독자 수:', subscribers.size)
+			// 구독 해제 함수 반환
+			return () => {
+				console.log('구독자 제거 시도')
+				const removed = subscribers.delete(callback)
+				console.log('구독자 제거 성공:', removed)
+				console.log('남은 구독자 수:', subscribers.size)
+			}
+		}
+	}
+}
+
+/**
  * MoleGame 모듈 - 함수형 패턴으로 구현
  *
  * @module MoleGame
@@ -8,7 +54,8 @@
  * @typedef {Object} Settings
  * @property {number} moleCount - 두더지 수
  * @property {number} gameDuration - 게임 전체 시간 (ms)
- * @property {number} moleDuration - 각 두더지가 나타나는 시간 (ms)
+ * @property {number} moleDurationMin - 각 두더지가 나타나는 최소 시간 (ms)
+ * @property {number} moleDurationMax - 각 두더지가 나타나는 최대 시간 (ms)
  */
 
 /**
@@ -92,44 +139,13 @@ const createMoleGame = (customSettings = {}) => {
 		moles: moles.map((mole) => mole.isVisible)
 	})
 
-	/**
-	 * 구독자 관리를 위한 객체
-	 *
-	 * @type {{
-	 * 	subscribers: Set<Function>
-	 * 	notify: Function
-	 * 	subscribe: Function
-	 * 	unsubscribe: Function
-	 * }}
-	 */
-	const subscribers = {
-		subscribers: new Set(),
-
-		notify(state) {
-			this.subscribers.forEach((callback) => {
-				try {
-					callback(state)
-				} catch (error) {
-					console.error('구독자 알림 중 오류:', error)
-				}
-			})
-		},
-
-		subscribe(callback) {
-			this.subscribers.add(callback)
-			// 구독 해제 함수 반환
-			return () => this.unsubscribe(callback)
-		},
-
-		unsubscribe(callback) {
-			this.subscribers.delete(callback)
-		}
-	}
+	// 구독자 관리
+	const subscribersManager = createSubscribers()
 
 	/** 현재 상태를 모든 구독자에게 알립니다. */
 	const notifySubscribers = () => {
 		const state = getState()
-		subscribers.notify(state)
+		subscribersManager.notify(state)
 	}
 
 	/**
@@ -264,13 +280,28 @@ const createMoleGame = (customSettings = {}) => {
 	// 점수 가져오기
 	const getScore = () => score
 
+	/**
+	 * 현재 게임 상태를 가져옵니다.
+	 *
+	 * @returns {GameState} 현재 상태
+	 */
+	const getStateFn = () => getState()
+
+	/**
+	 * 상태 변화를 알리기 위해 구독자를 추가합니다.
+	 *
+	 * @param {SubscriberCallback} callback - 상태 변경 시 호출될 콜백 함수
+	 * @returns {Function} 구독 해제 함수
+	 */
+	const subscribeFn = (callback) => subscribersManager.subscribe(callback)
+
 	return {
 		startGame, // 게임 시작
 		endGame, // 게임 끝
 		whackMole, // 두더지 잡기
 		getScore, // 점수 가져오기
-		getState, // 현재 상태 가져오기
-		subscribe: (callback) => subscribers.subscribe(callback) // 상태 변화를 알림
+		getState: getStateFn, // 현재 상태 가져오기
+		subscribe: subscribeFn // 상태 변화 알림
 	}
 }
 
