@@ -13,7 +13,6 @@ const createSubscribers = () => {
 		 * @param {GameState} state - 현재 게임 상태
 		 */
 		notify(state) {
-			console.log('현재 구독자 수:', subscribers.size)
 			subscribers.forEach((callback) => {
 				try {
 					callback(state)
@@ -32,7 +31,6 @@ const createSubscribers = () => {
 		subscribe(callback) {
 			console.log('새로운 구독자 추가')
 			subscribers.add(callback)
-			console.log('현재 구독자 수:', subscribers.size)
 			// 구독 해제 함수 반환
 			return () => {
 				console.log('구독자 제거 시도')
@@ -79,11 +77,10 @@ const createSubscribers = () => {
 /**
  * MoleGame 팩토리 함수
  *
- * @param {Settings} [customSettings={}] - 사용자 정의 설정. Default is `{}`
  * @returns {Object} MoleGame 인스턴스
  */
 
-const createMoleGame = (customSettings = {}) => {
+const createMoleGame = () => {
 	/**
 	 * 기본 게임 설정을 반환합니다.
 	 *
@@ -280,28 +277,13 @@ const createMoleGame = (customSettings = {}) => {
 	// 점수 가져오기
 	const getScore = () => score
 
-	/**
-	 * 현재 게임 상태를 가져옵니다.
-	 *
-	 * @returns {GameState} 현재 상태
-	 */
-	const getStateFn = () => getState()
-
-	/**
-	 * 상태 변화를 알리기 위해 구독자를 추가합니다.
-	 *
-	 * @param {SubscriberCallback} callback - 상태 변경 시 호출될 콜백 함수
-	 * @returns {Function} 구독 해제 함수
-	 */
-	const subscribeFn = (callback) => subscribersManager.subscribe(callback)
-
 	return {
 		startGame, // 게임 시작
 		endGame, // 게임 끝
 		whackMole, // 두더지 잡기
 		getScore, // 점수 가져오기
-		getState: getStateFn, // 현재 상태 가져오기
-		subscribe: subscribeFn // 상태 변화 알림
+		getState, // 현재 상태 가져오기
+		subscribe: subscribersManager.subscribe.bind(subscribersManager) // 메서드 바인딩
 	}
 }
 
